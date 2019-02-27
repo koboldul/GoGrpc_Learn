@@ -10,7 +10,22 @@ import (
 	grpc "google.golang.org/grpc"
 )
 
+const port = 55557
+
 type server struct {
+}
+
+func main() {
+	fmt.Printf("Starting local on port %v \n", port)
+
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%v", port))
+
+	if common.IsSuccess(err, "Error on starting listener") {
+		s := grpc.NewServer()
+		calcpb.RegisterCalcSvcServer(s, &server{})
+
+		common.IsSuccess(s.Serve(lis), "Error registering the server")
+	}
 }
 
 func (*server) Sum(ctx context.Context, req *calcpb.SumRequest) (*calcpb.SumResponse, error) {
@@ -29,35 +44,46 @@ func (*server) Sum(ctx context.Context, req *calcpb.SumRequest) (*calcpb.SumResp
 }
 
 func (*server) PrimeNoDecomp(req *calcpb.PrimeNoDecompRequest, stream calcpb.CalcSvc_PrimeNoDecompServer) error {
-	fmt.Printf("Decompistion in primes invoked with request %v \n", req)
-
-	//number := req.GetNumber()
-
-	primes := []int64{2, 3, 5, 7}
-
-	for i, p := range primes {
-		res := &calcpb.PrimeNoDecompResponse{
-			PrimeFactor: p,
-			Power:       int64(i),
-		}
-
-		stream.Send(res)
-	}
+	fmt.Printf("Decompostion in primes invoked with request %v \n", req)
+	number := req.GetNumber()
+	processPrimes(number, stream.Send)
 
 	return nil
 }
 
-const port = 55557
+func processPrimes(number int64, send func(*calcpb.PrimeNoDecompResponse) error) {
+	div := int64(2)
+	currentFact := []int64{}
 
-func main() {
-	fmt.Printf("Starting local on port %v \n", port)
+	for number > 1 {
+		if number%div == 0 {
+			number = number / div
+			currentFact = append(currentFact, div)
+		} else {
+			switch {
+			case div == 2:
+				div++
+			default:
+				div += 2
+			}
+		}
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%v", port))
+		l := len(currentFact)
+		if l > 0 && currentFact[0] != currentFact[l-1] {
+			send(composeResult(currentFact, l))
+			currentFact = currentFact[l-1:]
+		}
+	}
 
-	if common.IsSuccess(err, "Error on starting listener") {
-		s := grpc.NewServer()
-		calcpb.RegisterCalcSvcServer(s, &server{})
+	l := len(currentFact)
+	if l > 0 {
+		send(composeResult(currentFact, l+1))
+	}
+}
 
-		common.IsSuccess(s.Serve(lis), "Error registering the server")
+func composeResult(currentFact []int64, l int) *calcpb.PrimeNoDecompResponse {
+	return &calcpb.PrimeNoDecompResponse{
+		PrimeFactor: currentFact[0],
+		Power:       int64(l - 1),
 	}
 }
