@@ -147,16 +147,96 @@ func (m *GreetResponse) GetResult() string {
 	return ""
 }
 
+type GreetManyTimesRequest struct {
+	Greeting             *Greeting `protobuf:"bytes,1,opt,name=greeting,proto3" json:"greeting,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *GreetManyTimesRequest) Reset()         { *m = GreetManyTimesRequest{} }
+func (m *GreetManyTimesRequest) String() string { return proto.CompactTextString(m) }
+func (*GreetManyTimesRequest) ProtoMessage()    {}
+func (*GreetManyTimesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_fe6f881da19a2871, []int{3}
+}
+
+func (m *GreetManyTimesRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GreetManyTimesRequest.Unmarshal(m, b)
+}
+func (m *GreetManyTimesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GreetManyTimesRequest.Marshal(b, m, deterministic)
+}
+func (m *GreetManyTimesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GreetManyTimesRequest.Merge(m, src)
+}
+func (m *GreetManyTimesRequest) XXX_Size() int {
+	return xxx_messageInfo_GreetManyTimesRequest.Size(m)
+}
+func (m *GreetManyTimesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GreetManyTimesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GreetManyTimesRequest proto.InternalMessageInfo
+
+func (m *GreetManyTimesRequest) GetGreeting() *Greeting {
+	if m != nil {
+		return m.Greeting
+	}
+	return nil
+}
+
+type GreetManyTimesResponse struct {
+	Result               string   `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GreetManyTimesResponse) Reset()         { *m = GreetManyTimesResponse{} }
+func (m *GreetManyTimesResponse) String() string { return proto.CompactTextString(m) }
+func (*GreetManyTimesResponse) ProtoMessage()    {}
+func (*GreetManyTimesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_fe6f881da19a2871, []int{4}
+}
+
+func (m *GreetManyTimesResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GreetManyTimesResponse.Unmarshal(m, b)
+}
+func (m *GreetManyTimesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GreetManyTimesResponse.Marshal(b, m, deterministic)
+}
+func (m *GreetManyTimesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GreetManyTimesResponse.Merge(m, src)
+}
+func (m *GreetManyTimesResponse) XXX_Size() int {
+	return xxx_messageInfo_GreetManyTimesResponse.Size(m)
+}
+func (m *GreetManyTimesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GreetManyTimesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GreetManyTimesResponse proto.InternalMessageInfo
+
+func (m *GreetManyTimesResponse) GetResult() string {
+	if m != nil {
+		return m.Result
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*Greeting)(nil), "greet.Greeting")
 	proto.RegisterType((*GreetRequest)(nil), "greet.GreetRequest")
 	proto.RegisterType((*GreetResponse)(nil), "greet.GreetResponse")
+	proto.RegisterType((*GreetManyTimesRequest)(nil), "greet.GreetManyTimesRequest")
+	proto.RegisterType((*GreetManyTimesResponse)(nil), "greet.GreetManyTimesResponse")
 }
 
 func init() { proto.RegisterFile("greet/greetpb/greet.proto", fileDescriptor_fe6f881da19a2871) }
 
 var fileDescriptor_fe6f881da19a2871 = []byte{
-	// 207 bytes of a gzipped FileDescriptorProto
+	// 255 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x4c, 0x2f, 0x4a, 0x4d,
 	0x2d, 0xd1, 0x07, 0x93, 0x05, 0x49, 0x10, 0x5a, 0xaf, 0xa0, 0x28, 0xbf, 0x24, 0x5f, 0x88, 0x15,
 	0xcc, 0x51, 0xf2, 0xe2, 0xe2, 0x70, 0x07, 0x31, 0x32, 0xf3, 0xd2, 0x85, 0x64, 0xb9, 0xb8, 0xd2,
@@ -166,10 +246,13 @@ var fileDescriptor_fe6f881da19a2871 = []byte{
 	0x56, 0x50, 0x6a, 0x61, 0x69, 0x6a, 0x71, 0x89, 0x90, 0x36, 0x17, 0x47, 0x3a, 0xd4, 0x6c, 0xb0,
 	0x69, 0xdc, 0x46, 0xfc, 0x7a, 0x10, 0x27, 0xc0, 0xac, 0x0c, 0x82, 0x2b, 0x50, 0x52, 0xe7, 0xe2,
 	0x85, 0x6a, 0x2e, 0x2e, 0xc8, 0xcf, 0x2b, 0x4e, 0x15, 0x12, 0xe3, 0x62, 0x2b, 0x4a, 0x2d, 0x2e,
-	0xcd, 0x29, 0x81, 0xba, 0x04, 0xca, 0x33, 0x72, 0x81, 0xda, 0x12, 0x9c, 0x5a, 0x54, 0x96, 0x99,
-	0x9c, 0x2a, 0x64, 0xc2, 0xc5, 0x0a, 0xe6, 0x0b, 0x09, 0x23, 0x1b, 0x0e, 0x75, 0x83, 0x94, 0x08,
-	0xaa, 0x20, 0xc4, 0x6c, 0x25, 0x06, 0x27, 0xce, 0x28, 0x76, 0x68, 0xa8, 0x24, 0xb1, 0x81, 0x03,
-	0xc4, 0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0x2c, 0x98, 0xab, 0x64, 0x2d, 0x01, 0x00, 0x00,
+	0xcd, 0x29, 0x81, 0xba, 0x04, 0xca, 0x53, 0x72, 0xe1, 0x12, 0x05, 0x2b, 0xf4, 0x4d, 0xcc, 0xab,
+	0x0c, 0xc9, 0xcc, 0x4d, 0x2d, 0x26, 0xcb, 0x3a, 0x03, 0x2e, 0x31, 0x74, 0x53, 0xf0, 0xdb, 0x6b,
+	0x34, 0x9d, 0x11, 0xea, 0xbd, 0xe0, 0xd4, 0xa2, 0xb2, 0xcc, 0xe4, 0x54, 0x21, 0x13, 0x2e, 0x56,
+	0x30, 0x5f, 0x48, 0x18, 0xd9, 0x1a, 0xa8, 0x6b, 0xa4, 0x44, 0x50, 0x05, 0x21, 0x86, 0x2b, 0x31,
+	0x08, 0x05, 0x72, 0xf1, 0xa1, 0x5a, 0x2c, 0x24, 0x83, 0xac, 0x12, 0xdd, 0x57, 0x52, 0xb2, 0x38,
+	0x64, 0x61, 0x06, 0x1a, 0x30, 0x3a, 0x71, 0x46, 0xb1, 0x43, 0x63, 0x38, 0x89, 0x0d, 0x1c, 0xb9,
+	0xc6, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0x34, 0x33, 0x65, 0x3a, 0xf9, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -186,6 +269,8 @@ const _ = grpc.SupportPackageIsVersion4
 type GreetServiceClient interface {
 	//Unary
 	Greet(ctx context.Context, in *GreetRequest, opts ...grpc.CallOption) (*GreetResponse, error)
+	//Server Streaming
+	GreetManyTimes(ctx context.Context, in *GreetManyTimesRequest, opts ...grpc.CallOption) (GreetService_GreetManyTimesClient, error)
 }
 
 type greetServiceClient struct {
@@ -205,10 +290,44 @@ func (c *greetServiceClient) Greet(ctx context.Context, in *GreetRequest, opts .
 	return out, nil
 }
 
+func (c *greetServiceClient) GreetManyTimes(ctx context.Context, in *GreetManyTimesRequest, opts ...grpc.CallOption) (GreetService_GreetManyTimesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_GreetService_serviceDesc.Streams[0], "/greet.GreetService/GreetManyTimes", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &greetServiceGreetManyTimesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type GreetService_GreetManyTimesClient interface {
+	Recv() (*GreetManyTimesResponse, error)
+	grpc.ClientStream
+}
+
+type greetServiceGreetManyTimesClient struct {
+	grpc.ClientStream
+}
+
+func (x *greetServiceGreetManyTimesClient) Recv() (*GreetManyTimesResponse, error) {
+	m := new(GreetManyTimesResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // GreetServiceServer is the server API for GreetService service.
 type GreetServiceServer interface {
 	//Unary
 	Greet(context.Context, *GreetRequest) (*GreetResponse, error)
+	//Server Streaming
+	GreetManyTimes(*GreetManyTimesRequest, GreetService_GreetManyTimesServer) error
 }
 
 func RegisterGreetServiceServer(s *grpc.Server, srv GreetServiceServer) {
@@ -233,6 +352,27 @@ func _GreetService_Greet_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GreetService_GreetManyTimes_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GreetManyTimesRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(GreetServiceServer).GreetManyTimes(m, &greetServiceGreetManyTimesServer{stream})
+}
+
+type GreetService_GreetManyTimesServer interface {
+	Send(*GreetManyTimesResponse) error
+	grpc.ServerStream
+}
+
+type greetServiceGreetManyTimesServer struct {
+	grpc.ServerStream
+}
+
+func (x *greetServiceGreetManyTimesServer) Send(m *GreetManyTimesResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 var _GreetService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "greet.GreetService",
 	HandlerType: (*GreetServiceServer)(nil),
@@ -242,6 +382,12 @@ var _GreetService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _GreetService_Greet_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GreetManyTimes",
+			Handler:       _GreetService_GreetManyTimes_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "greet/greetpb/greet.proto",
 }
