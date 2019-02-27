@@ -1,12 +1,12 @@
-package main
+package calcserver
 
 import (
 	"context"
 	"fmt"
 	"net"
 
-	"../../common"
-	"../calcpb"
+	"../../../common"
+	"../../calcpb"
 	grpc "google.golang.org/grpc"
 )
 
@@ -15,7 +15,7 @@ const port = 55557
 type server struct {
 }
 
-func main() {
+func RunServer() {
 	fmt.Printf("Starting local on port %v \n", port)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%v", port))
