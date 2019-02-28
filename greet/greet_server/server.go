@@ -9,6 +9,9 @@ import (
 	"strings"
 	"time"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"../../common"
 
 	"../greetpb"
@@ -27,6 +30,27 @@ func (*server) Greet(ctx context.Context, req *greetpb.GreetRequest) (*greetpb.G
 
 	result := "Hello " + firstName
 	res := &greetpb.GreetResponse{
+		Result: result,
+	}
+
+	return res, nil
+}
+
+func (*server) GreetWithDeadline(ctx context.Context, req *greetpb.GreetWithDeadlineRequest) (*greetpb.GreetWithDeadlineResponse, error) {
+	fmt.Printf("Greet invoked with request %v \n", req)
+
+	for i := 0; i < 3; i++ {
+		if ctx.Err() == context.Canceled {
+			fmt.Println("Client canceled the request")
+			return nil, status.Error(codes.Canceled, "Timeout!")
+		}
+		time.Sleep(2 * time.Second)
+	}
+
+	firstName := req.GetGreeting().GetFirstName()
+
+	result := "Hello " + firstName
+	res := &greetpb.GreetWithDeadlineResponse{
 		Result: result,
 	}
 

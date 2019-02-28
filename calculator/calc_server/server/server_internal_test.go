@@ -3,8 +3,13 @@ package calcserver
 import (
 	"fmt"
 	"io"
+	"math"
 	"testing"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"../../calcpb"
 	cpb "../../calcpb"
 	grpc "google.golang.org/grpc"
 )
@@ -113,6 +118,49 @@ func TestComputeMaxHappy(t *testing.T) {
 			t.Fatalf("Should not be errored")
 		}
 	}
+}
+
+func TestSqrt(t *testing.T) {
+	var testTable = map[int32]float64{
+		4: 2,
+		2: 1.41,
+	}
+
+	s := server{}
+	for input, expected := range testTable {
+		rq := &calcpb.SqrtRequest{Number: input}
+
+		rsp, _ := s.Sqrt(nil, rq)
+		actual := rsp.GetSqrt()
+
+		if math.Abs(actual-expected) > 0.01 {
+			t.Fatalf("The sqrt of %d should be %v but was %v", input, expected, actual)
+		}
+	}
+
+}
+
+func TestSqrtInvalidArg(t *testing.T) {
+	s := server{}
+
+	rq := &calcpb.SqrtRequest{Number: -2}
+
+	_, err := s.Sqrt(nil, rq)
+
+	if err == nil {
+		t.Fatalf("There should have been an %v error returned. Err: %v", codes.InvalidArgument, err)
+	} else {
+		respErr, ok := status.FromError(err)
+		switch {
+		case !ok:
+			t.Fatalf("There should have been an user error returned. Err: %v", err)
+		case respErr.Code() != codes.InvalidArgument:
+			t.Fatalf("The code should have been %v but was %v", codes.InvalidArgument, respErr.Code())
+		default:
+
+		}
+	}
+
 }
 
 //ComputeAverage tests

@@ -10,6 +10,7 @@ import (
 	common "../../common"
 	calcpb "../calcpb"
 	grpc "google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 )
 
 const port = 55557
@@ -27,7 +28,25 @@ func main() {
 
 	c := calcpb.NewCalcSvcClient(conn)
 
-	doBidiStream(c, []int32{34, 37, 59, 7, 99, 0, -99})
+	//doBidiStream(c, []int32{34, 37, 59, 7, 99, 0, -99})
+	doErrorCheck(c, 2)
+}
+
+func doErrorCheck(c calcpb.CalcSvcClient, a int32) {
+	rq := &calcpb.SqrtRequest{
+		Number: a,
+	}
+
+	rsp, err := c.Sqrt(context.Background(), rq)
+
+	if err != nil {
+		respErr, ok := status.FromError(err)
+		if ok { //error from grpc
+			fmt.Printf("Response is %v \n", respErr.Code())
+		}
+	} else {
+		fmt.Printf("Response is %v \n", rsp)
+	}
 }
 
 func doClientStream(c calcpb.CalcSvcClient, a []int32) {

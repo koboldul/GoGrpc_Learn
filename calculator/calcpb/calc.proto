@@ -12,6 +12,15 @@ message SumResponse {
     int32 sum_result = 1;
 }
 
+//Sqrt
+message  SqrtRequest {
+    int32 number = 1;
+}
+
+message SqrtResponse {
+    double sqrt = 1;
+}
+
 message PrimeNoDecompRequest {
     int64 number = 1;
 }
@@ -40,6 +49,11 @@ message ComputeMaxResponse {
 service CalcSvc {
     //Unary
     rpc Sum(SumRequest) returns (SumResponse) {};
+
+    //error handling
+    //this rpc will throw an exception if the number is negaive
+    //the error is of type INVALID_ARGUMENT 
+    rpc Sqrt(SqrtRequest) returns (SqrtResponse) {};
 
     //Stream Server
     rpc PrimeNoDecomp(PrimeNoDecompRequest) 

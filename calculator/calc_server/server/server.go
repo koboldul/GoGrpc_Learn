@@ -10,6 +10,8 @@ import (
 	"../../../common"
 	"../../calcpb"
 	grpc "google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 const port = 55557
@@ -28,6 +30,20 @@ func RunServer() {
 
 		common.IsSuccess(s.Serve(lis), "Error registering the server")
 	}
+}
+
+func (*server) Sqrt(ctx context.Context, req *calcpb.SqrtRequest) (*calcpb.SqrtResponse, error) {
+	number := req.GetNumber()
+
+	if number < 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Non negatives!")
+	}
+
+	res := &calcpb.SqrtResponse{
+		Sqrt: math.Sqrt(float64(number)),
+	}
+
+	return res, nil
 }
 
 func (*server) Sum(ctx context.Context, req *calcpb.SumRequest) (*calcpb.SumResponse, error) {

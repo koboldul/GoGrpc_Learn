@@ -7,6 +7,8 @@ import (
 	"log"
 	"time"
 
+	"google.golang.org/grpc/codes"
+
 	common "../../common"
 	greetx "../greetpb"
 	grpc "google.golang.org/grpc"
@@ -24,7 +26,7 @@ func main() {
 	c := greetx.NewGreetServiceClient(conn)
 
 	//doUnary(c)
-	doBidiStreaming(c)
+	doUnaryWithDeadline(c)
 }
 
 func doBidiStreaming(c greetx.GreetServiceClient) {
@@ -137,4 +139,25 @@ func doUnary(c greetx.GreetServiceClient) {
 	}
 
 	log.Printf("Response, %v \n", rsp.Result)
+}
+
+func doUnaryWithDeadline(c greetx.GreetServiceClient) {
+	rq := &greetx.GreetWithDeadlineRequest{
+		Greeting: &greetx.Greeting{
+			FirstName:  "dedline",
+			SecondName: "dddddd",
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	rsp, err := c.GreetWithDeadline(ctx, rq)
+
+	expectedErrors := map[codes.Code]string{
+		codes.DeadlineExceeded: "Timeout while greeting!",
+	}
+	if common.IsGrpcSuccess(err, "Error occured while calling greet", expectedErrors) {
+		log.Printf("Response, %v \n", rsp.Result)
+	}
 }

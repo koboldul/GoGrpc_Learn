@@ -13,6 +13,11 @@ func doUnary(c calcpb.CalcSvcClient, a int32, b int32) {
 		SecondNumber: b,
 	}
 
+	rsp, err := c.Sum(context.Background(), rq)rq := &calcpb.SumRequest{
+		FirstNumber:  a,
+		SecondNumber: b,
+	}
+
 	rsp, err := c.Sum(context.Background(), rq)
 
 	if err != nil {
