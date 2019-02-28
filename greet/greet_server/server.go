@@ -69,6 +69,37 @@ func (*server) LongGreet(stream greetpb.GreetService_LongGreetServer) error {
 	})
 }
 
+func (*server) GreetAll(stream greetpb.GreetService_GreetAllServer) error {
+	fmt.Println("Received all request")
+
+	for {
+		rq, err := stream.Recv()
+
+		fmt.Printf("Received request %v \n", rq)
+
+		if err == io.EOF {
+			break
+		}
+
+		if !common.IsSuccess(err, "Error getting rq") {
+			return err
+		}
+
+		firstName := rq.GetGreeting().GetFirstName()
+		result := fmt.Sprintf("Hello %v !", firstName)
+
+		err = stream.Send(&greetpb.GreetAllResponse{
+			Result: result,
+		})
+
+		if !common.IsSuccess(err, "Error sending the response") {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func main() {
 
 	fmt.Printf("Waiting requests on port %d ... \n", port)

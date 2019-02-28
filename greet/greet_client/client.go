@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"time"
 
 	common "../../common"
 	greetx "../greetpb"
@@ -23,7 +24,54 @@ func main() {
 	c := greetx.NewGreetServiceClient(conn)
 
 	//doUnary(c)
-	doClientStreaming(c)
+	doBidiStreaming(c)
+}
+
+func doBidiStreaming(c greetx.GreetServiceClient) {
+	stream, err := c.GreetAll(context.Background())
+
+	requests := []*greetx.GreetAllRequest{
+		&greetx.GreetAllRequest{Greeting: &greetx.Greeting{FirstName: "xxx1", SecondName: "yyy1"}},
+		&greetx.GreetAllRequest{Greeting: &greetx.Greeting{FirstName: "xxx2", SecondName: "yyy1"}},
+		&greetx.GreetAllRequest{Greeting: &greetx.Greeting{FirstName: "xxx3", SecondName: "yyy1"}},
+		&greetx.GreetAllRequest{Greeting: &greetx.Greeting{FirstName: "xxx4", SecondName: "yyy1"}},
+		&greetx.GreetAllRequest{Greeting: &greetx.Greeting{FirstName: "xxx5", SecondName: "yyy1"}},
+	}
+
+	if common.IsSuccess(err, "Error whilw calling greeting all") {
+
+		waitc := make(chan struct{})
+
+		go func() {
+			for _, rq := range requests {
+				fmt.Printf("Sending message: %v\n", rq)
+				err := stream.Send(rq)
+				if !common.IsSuccess(err, "WTF ") {
+					break
+				}
+				time.Sleep(time.Second)
+			}
+			stream.CloseSend()
+		}()
+
+		go func() {
+			for {
+				rsp, err := stream.Recv()
+				if err == io.EOF {
+					break
+				} else {
+					if common.IsSuccess(err, "Error finishing request") {
+						fmt.Printf("Response geeting: %v \n", rsp.GetResult())
+					} else {
+						break
+					}
+				}
+			}
+			close(waitc)
+		}()
+
+		<-waitc
+	}
 }
 
 func doClientStreaming(c greetx.GreetServiceClient) {
