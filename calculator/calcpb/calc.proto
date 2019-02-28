@@ -21,6 +21,14 @@ message PrimeNoDecompResponse {
     int64 power=2;
 }
 
+message  ComputeAverageRequest {
+    int32 number = 1;
+}
+
+message ComputeAverageResponse {
+    double average = 1;
+}
+
 service CalcSvc {
     //Unary
     rpc Sum(SumRequest) returns (SumResponse) {};
@@ -28,4 +36,8 @@ service CalcSvc {
     //Stream Server
     rpc PrimeNoDecomp(PrimeNoDecompRequest) 
     returns (stream PrimeNoDecompResponse) {};
+
+    //Stream Client
+
+    rpc ComputeAverage (stream ComputeAverageRequest) returns (ComputeAverageResponse){};
 }

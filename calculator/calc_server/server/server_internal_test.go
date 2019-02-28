@@ -2,9 +2,11 @@ package calcserver
 
 import (
 	"fmt"
+	"io"
 	"testing"
 
 	cpb "../../calcpb"
+	grpc "google.golang.org/grpc"
 )
 
 func TestProcessPrime(t *testing.T) {
@@ -57,4 +59,66 @@ func TestProcessPrime(t *testing.T) {
 		}
 	}
 
+}
+
+func TestComputeAverageHappy(t *testing.T) {
+	testTable := map[float64][]int32{
+		2:   []int32{2, 2},
+		2.5: []int32{1, 2, 3, 4},
+	}
+
+	for assert, input := range testTable {
+		//Arrange
+		s := server{}
+		idx := int32(0)
+		fmt.Printf("Index address : %v \n", &idx)
+		c := ComputeAverageServerMock{
+			t:        t,
+			expected: assert,
+			numbers:  input,
+			current:  &idx,
+		}
+
+		//Act
+		err := s.ComputeAverage(c)
+
+		if err != nil {
+			t.Fatalf("Should not be errored")
+		}
+	}
+}
+
+//ComputeAverage tests
+type ComputeAverageServerMock struct {
+	grpc.ServerStream
+
+	t        *testing.T
+	current  *int32
+	numbers  []int32
+	expected float64
+}
+
+func (m ComputeAverageServerMock) SendAndClose(rsp *cpb.ComputeAverageResponse) error {
+	avg := rsp.GetAverage()
+
+	if avg != m.expected {
+		m.t.Fatalf("The average expected for testcase number %d should be %v but was %v", *m.current, m.expected, avg)
+	}
+
+	return nil
+}
+
+func (m ComputeAverageServerMock) Recv() (*cpb.ComputeAverageRequest, error) {
+	fmt.Printf("Was called request, %v \n", *m.current)
+
+	if *m.current == int32(len(m.numbers)) {
+		return nil, io.EOF
+	}
+
+	rq := &cpb.ComputeAverageRequest{
+		Number: m.numbers[*m.current],
+	}
+	*m.current++
+
+	return rq, nil
 }

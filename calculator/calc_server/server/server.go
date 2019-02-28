@@ -3,6 +3,7 @@ package calcserver
 import (
 	"context"
 	"fmt"
+	"io"
 	"net"
 
 	"../../../common"
@@ -49,6 +50,28 @@ func (*server) PrimeNoDecomp(req *calcpb.PrimeNoDecompRequest, stream calcpb.Cal
 	processPrimes(number, stream.Send)
 
 	return nil
+}
+
+func (*server) ComputeAverage(stream calcpb.CalcSvc_ComputeAverageServer) error {
+	sum := int32(0)
+	howMany := int32(0)
+
+	for {
+		rq, err := stream.Recv()
+
+		if err == io.EOF {
+			break
+		}
+		if common.IsSuccess(err, "Error reading input") {
+			n := rq.GetNumber()
+			howMany++
+			sum += n
+		}
+	}
+
+	return stream.SendAndClose(&calcpb.ComputeAverageResponse{
+		Average: float64(sum) / float64(howMany),
+	})
 }
 
 func processPrimes(number int64, send func(*calcpb.PrimeNoDecompResponse) error) {

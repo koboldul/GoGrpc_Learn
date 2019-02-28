@@ -3,13 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net"
+	"strings"
 	"time"
+
+	"../../common"
 
 	"../greetpb"
 	grpc "google.golang.org/grpc"
 )
+
+const port = 55555
 
 type server struct {
 }
@@ -45,7 +51,23 @@ func (*server) GreetManyTimes(req *greetpb.GreetManyTimesRequest, stream greetpb
 	return nil
 }
 
-const port = 55555
+func (*server) LongGreet(stream greetpb.GreetService_LongGreetServer) error {
+	var sb strings.Builder
+
+	for {
+		rq, error := stream.Recv()
+		if error == io.EOF {
+			break
+		}
+		if common.IsSuccess(error, "Receiving part of request failed!") {
+			sb.WriteString(fmt.Sprintf("%v \n", rq.GetGreeting().GetFirstName()))
+		}
+	}
+
+	return stream.SendAndClose(&greetpb.LongGreetResponse{
+		Result: sb.String(),
+	})
+}
 
 func main() {
 

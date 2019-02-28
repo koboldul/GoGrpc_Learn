@@ -23,7 +23,30 @@ func main() {
 	c := greetx.NewGreetServiceClient(conn)
 
 	//doUnary(c)
-	doServerStreaming(c)
+	doClientStreaming(c)
+}
+
+func doClientStreaming(c greetx.GreetServiceClient) {
+	stream, err := c.LongGreet(context.Background())
+
+	requests := []*greetx.LongGreetRequest{
+		&greetx.LongGreetRequest{Greeting: &greetx.Greeting{FirstName: "xxx1", SecondName: "yyy1"}},
+		&greetx.LongGreetRequest{Greeting: &greetx.Greeting{FirstName: "xxx2", SecondName: "yyy1"}},
+		&greetx.LongGreetRequest{Greeting: &greetx.Greeting{FirstName: "xxx3", SecondName: "yyy1"}},
+		&greetx.LongGreetRequest{Greeting: &greetx.Greeting{FirstName: "xxx4", SecondName: "yyy1"}},
+		&greetx.LongGreetRequest{Greeting: &greetx.Greeting{FirstName: "xxx5", SecondName: "yyy1"}},
+	}
+
+	if common.IsSuccess(err, "Error whilw calling LongGreet") {
+		for _, rq := range requests {
+			stream.Send(rq)
+		}
+
+		rsp, err := stream.CloseAndRecv()
+		if common.IsSuccess(err, "Error finishing request") {
+			fmt.Printf("Response geeting: %v \n", rsp.GetResult())
+		}
+	}
 }
 
 func doServerStreaming(c greetx.GreetServiceClient) {
