@@ -26,7 +26,25 @@ func main() {
 
 	c := calcpb.NewCalcSvcClient(conn)
 
-	doStream(c, 34)
+	doClientStream(c, []int32{34, 37})
+}
+
+func doClientStream(c calcpb.CalcSvcClient, a []int32) {
+	stream, err := c.ComputeAverage(context.Background())
+
+	if common.IsSuccess(err, "Error while calling compute avg") {
+		for _, n := range a {
+			rq := &calcpb.ComputeAverageRequest{
+				Number: n,
+			}
+			stream.Send(rq)
+		}
+
+		rsp, err := stream.CloseAndRecv()
+		if common.IsSuccess(err, "Error finishing request") {
+			fmt.Printf("Response geeting: %v \n", rsp.GetAverage())
+		}
+	}
 }
 
 func doStream(c calcpb.CalcSvcClient, a int64) {
