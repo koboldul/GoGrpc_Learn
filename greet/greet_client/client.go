@@ -46,7 +46,7 @@ func doBidiStreaming(c greetx.GreetServiceClient) {
 			for _, rq := range requests {
 				fmt.Printf("Sending message: %v\n", rq)
 				err := stream.Send(rq)
-				if !common.IsSuccess(err, "WTF ") {
+				if !common.IsSuccess(err, fmt.Sprintf("Error sending request for %v ", rq)) {
 					break
 				}
 				time.Sleep(time.Second)

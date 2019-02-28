@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"time"
 
 	common "../../common"
 	calcpb "../calcpb"
@@ -26,7 +27,7 @@ func main() {
 
 	c := calcpb.NewCalcSvcClient(conn)
 
-	doClientStream(c, []int32{34, 37})
+	doBidiStream(c, []int32{34, 37, 59, 7, 99, 0, -99})
 }
 
 func doClientStream(c calcpb.CalcSvcClient, a []int32) {
@@ -66,4 +67,48 @@ func doStream(c calcpb.CalcSvcClient, a int64) {
 			}
 		}
 	}
+}
+
+func doBidiStream(c calcpb.CalcSvcClient, a []int32) {
+	stream, err := c.ComputeMax(context.Background())
+
+	if !common.IsSuccess(err, "Error while calling compute avg") {
+		return
+	}
+
+	waitc := make(chan struct{})
+
+	go func() {
+		defer stream.CloseSend()
+
+		for _, n := range a {
+			rq := &calcpb.ComputeMaxRequest{
+				Number: n,
+			}
+			err := stream.Send(rq)
+			if !common.IsSuccess(err, fmt.Sprintf("Error sending number request %d", n)) {
+				break
+			}
+			time.Sleep(time.Second)
+		}
+	}()
+
+	go func() {
+		defer close(waitc)
+
+		for {
+			rsp, err := stream.Recv()
+
+			switch {
+			case err == io.EOF:
+				break
+			case !common.IsSuccess(err, "Error receiving response"):
+				break
+			default:
+				fmt.Printf("Max so far is: %v\n", rsp.GetMax())
+			}
+		}
+	}()
+
+	<-waitc
 }
