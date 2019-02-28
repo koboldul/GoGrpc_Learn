@@ -88,6 +88,33 @@ func TestComputeAverageHappy(t *testing.T) {
 	}
 }
 
+func TestComputeMaxHappy(t *testing.T) {
+	testTable := map[int32][]maxTestCasePair{
+		0: {{2, 2}, {1, 2}, {9, 9}},
+		1: {{0, 0}},
+		2: {},
+	}
+
+	for _, input := range testTable {
+		//Arrange
+		s := server{}
+		idx := int32(0)
+		fmt.Printf("Index address : %v \n", &idx)
+		c := ComputeMaxServerMock{
+			t:       t,
+			input:   input,
+			current: &idx,
+		}
+
+		//Act
+		err := s.ComputeMax(c)
+
+		if err != nil {
+			t.Fatalf("Should not be errored")
+		}
+	}
+}
+
 //ComputeAverage tests
 type ComputeAverageServerMock struct {
 	grpc.ServerStream
@@ -119,6 +146,48 @@ func (m ComputeAverageServerMock) Recv() (*cpb.ComputeAverageRequest, error) {
 		Number: m.numbers[*m.current],
 	}
 	*m.current++
+
+	return rq, nil
+}
+
+type maxTestCasePair struct {
+	in       int32
+	expected int32
+}
+
+//Compute Max tests
+type ComputeMaxServerMock struct {
+	grpc.ServerStream
+
+	t       *testing.T
+	current *int32
+	input   []maxTestCasePair
+}
+
+func (m ComputeMaxServerMock) Send(rsp *cpb.ComputeMaxResponse) error {
+	max := rsp.GetMax()
+
+	expected := m.input[*m.current].expected
+
+	if max != expected {
+		m.t.Fatalf("The average expected for testcase number %d should be %v but was %v", *m.current, expected, max)
+	}
+
+	*m.current++
+
+	return nil
+}
+
+func (m ComputeMaxServerMock) Recv() (*cpb.ComputeMaxRequest, error) {
+	fmt.Printf("Was called request, %v \n", *m.current)
+
+	if *m.current == int32(len(m.input)) {
+		return nil, io.EOF
+	}
+
+	rq := &cpb.ComputeMaxRequest{
+		Number: m.input[*m.current].in,
+	}
 
 	return rq, nil
 }

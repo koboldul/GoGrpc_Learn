@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"math"
 	"net"
 
 	"../../../common"
@@ -72,6 +73,37 @@ func (*server) ComputeAverage(stream calcpb.CalcSvc_ComputeAverageServer) error 
 	return stream.SendAndClose(&calcpb.ComputeAverageResponse{
 		Average: float64(sum) / float64(howMany),
 	})
+}
+
+func (*server) ComputeMax(stream calcpb.CalcSvc_ComputeMaxServer) error {
+	max := int32(math.MinInt32)
+
+	for {
+		rq, err := stream.Recv()
+
+		if err == io.EOF {
+			fmt.Println("End of streaming")
+			break
+		}
+		if !common.IsSuccess(err, "Error reading max request") {
+			return err
+		}
+
+		n := rq.GetNumber()
+		if max < n {
+			max = n
+		}
+
+		err = stream.Send(&calcpb.ComputeMaxResponse{
+			Max: max,
+		})
+
+		if !common.IsSuccess(err, "Error sendinf response") {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func processPrimes(number int64, send func(*calcpb.PrimeNoDecompResponse) error) {

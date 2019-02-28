@@ -29,6 +29,14 @@ message ComputeAverageResponse {
     double average = 1;
 }
 
+message  ComputeMaxRequest {
+    int32 number = 1;
+}
+
+message ComputeMaxResponse {
+    int32 max = 1;
+}
+
 service CalcSvc {
     //Unary
     rpc Sum(SumRequest) returns (SumResponse) {};
@@ -38,6 +46,8 @@ service CalcSvc {
     returns (stream PrimeNoDecompResponse) {};
 
     //Stream Client
-
     rpc ComputeAverage (stream ComputeAverageRequest) returns (ComputeAverageResponse){};
+
+    //Bidi
+    rpc ComputeMax (stream ComputeMaxRequest) returns (stream ComputeMaxResponse){};
 }
