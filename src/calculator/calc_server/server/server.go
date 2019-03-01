@@ -9,8 +9,10 @@ import (
 
 	"../../../common"
 	"../../calcpb"
-	grpc "google.golang.org/grpc"
+
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 )
 
@@ -19,6 +21,7 @@ const port = 55557
 type server struct {
 }
 
+// RunServer Comment documentation
 func RunServer() {
 	fmt.Printf("Starting local on port %v \n", port)
 
@@ -28,6 +31,7 @@ func RunServer() {
 		s := grpc.NewServer()
 		calcpb.RegisterCalcSvcServer(s, &server{})
 
+		reflection.Register(s)
 		common.IsSuccess(s.Serve(lis), "Error registering the server")
 	}
 }

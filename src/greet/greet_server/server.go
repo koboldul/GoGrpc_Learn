@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 
 	"../../common"
@@ -129,15 +130,24 @@ func main() {
 	fmt.Printf("Waiting requests on port %d ... \n", port)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", port))
-
-	if err != nil {
-		log.Fatalf("Error: %v", err)
+	if !common.IsSuccess(err, "Error:") {
+		return
 	}
 
-	s := grpc.NewServer()
-	greetpb.RegisterGreetServiceServer(s, &server{})
+	certFile := "../../env/server.crt"
+	keyFile := "../../env/server.pem"
 
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("Error to serve: %v", err)
+	creds, err := credentials.NewServerTLSFromFile(certFile, keyFile)
+
+	if common.IsSuccess(err, "Failed loading certificates: ") {
+		opts := grpc.Creds(creds)
+		s := grpc.NewServer(opts)
+
+		greetpb.RegisterGreetServiceServer(s, &server{})
+
+		if err := s.Serve(lis); err != nil {
+			log.Fatalf("Error to serve: %v", err)
+		}
 	}
+
 }

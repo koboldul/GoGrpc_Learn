@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 
 	common "../../common"
 	greetx "../greetpb"
@@ -15,18 +16,27 @@ import (
 )
 
 func main() {
-	conn, err := grpc.Dial("localhost:55555", grpc.WithInsecure())
+	certFile := "../../../env/ca.crt"
 
-	if err != nil {
-		log.Fatalf("Couldn't connect: %v", err)
+	creds, err := credentials.NewClientTLSFromFile(certFile, "") //CA Trust certificate
+
+	if !common.IsSuccess(err, "Error bining certificates") {
+		return
+	}
+
+	opts := grpc.WithTransportCredentials(creds)
+
+	//conn, err := grpc.Dial("localhost:55555", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:55555", opts)
+	if !common.IsSuccess(err, "Couldn't connect:") {
+		return
 	}
 
 	defer conn.Close()
-
 	c := greetx.NewGreetServiceClient(conn)
 
-	//doUnary(c)
-	doUnaryWithDeadline(c)
+	doUnary(c)
+	//doUnaryWithDeadline(c)
 }
 
 func doBidiStreaming(c greetx.GreetServiceClient) {
